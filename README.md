@@ -81,6 +81,27 @@ adb shell /data/local/tmp/e
 臺版 3.0.1.0 ROM** 的 `abl.img` 取得(本 repo 不放小米專有韌體檔案)。
 `scripts/device_step1.sh` 是這個流程的手機端部分。此流程不清使用者資料。
 
+## 移植到其他區域版本(MIXM / EUXM / INXM…)
+
+這個 repo 只覆蓋 `WPMTWXM`。小米每條區域分支各自編譯核心,偏移不能共用——
+但**方法可以**。`tools/` 裡是我們實際用來產生臺版 target 的三支工具:
+
+```sh
+# 1. 從你的 OTA 包解出 boot.img(payload.bin 用 payload-dumper),然後:
+python3 tools/extract_offsets.py boot.img          # 產生 OFFSETS_ENTRY + 交叉驗證
+python3 tools/check_btf.py boot.img                # 驗證 struct 布局(決定 STRUCT_OFFSETS 能否沿用)
+python3 tools/check_feasibility.py boot.img        # 驗證 pselect 棧配置(決定 SHIFT)
+```
+
+- `extract_offsets.py`:抽 kallsyms、算全部偏移,並回讀 `init_task.comm` /
+  `init_cred.usage` / `init_uts_ns.release` 做交叉驗證——不通過就不要用
+- `check_btf.py`:從核心內嵌 BTF 讀出 `task_struct`/`cred`/`selinux_state`
+  欄位偏移,跟 `STRUCT_OFFSETS_6_12` 逐項比對
+- `check_feasibility.py`:反組譯 `futex_wait_requeue_pi` 與 `core_sys_select`
+  的幀配置,跟已知可行的核心比對(需要 `pip install capstone`)
+
+三支都過了,你的版本大概率能打。歡迎把新區域版本的 target 發 PR 加進來。
+
 ## 致謝
 
 - [Nebula Security](https://github.com/NebuSec/CyberMeowfia) — GhostLock 原始研究與 PoC
