@@ -1,7 +1,7 @@
-# GhostLock for REDMI K90 Pro Max — Taiwan Variant (myron, WPMTWXM)
+# GhostLock for POCO F8 Ultra / REDMI K90 Pro Max — Global & Taiwan Variant (myron, WPMTWXM)
 
-GhostLock (CVE-2026-43499) kernel exploit port for the **Taiwan/global firmware** of the
-REDMI K90 Pro Max (codename `myron`, Snapdragon 8 Elite Gen 5 / SM8850).
+GhostLock (CVE-2026-43499) kernel exploit port for the **global/Taiwan firmware** of the
+POCO F8 Ultra / REDMI K90 Pro Max (codename `myron`, Snapdragon 8 Elite Gen 5 / SM8850).
 
 **Target**: HyperOS `OS3.0.6.0.WPMTWXM` — kernel
 `6.12.23-android16-5-g5a0e85dd9db0-ab14499855-4k`
@@ -12,7 +12,7 @@ English summary below / 下方有英文摘要。
 
 ## 為什麼需要這個 port
 
-同一支手機、同一個 codename,臺灣版(WPMTWXM)和大陸版(WPMCNXM)的核心**不是同一個 binary**:
+同一支手機、同一個 codename,國際/臺灣版(WPMTWXM,即 POCO F8 Ultra)和大陸版(WPMCNXM)的核心**不是同一個 binary**:
 
 | ROM | kernel release | 編譯時間 |
 |---|---|---|
@@ -26,7 +26,7 @@ English summary below / 下方有英文摘要。
 - 實測:`init_task`/`init_cred` 差 0x10000,`selinux_state` 差 0x120c8(非固定位移)
 
 GhostLock 這類 data-only exploit 需要該次編譯的精確位址,所以**所有為陸版算的
-payload 在臺版全部無效**。這個 repo 就是補上臺版缺少的那張偏移表。
+payload 在國際版全部無效**。這個 repo 就是補上國際版缺少的那張偏移表。
 
 ## 內容
 
@@ -76,7 +76,7 @@ adb shell /data/local/tmp/e
 
 ## 後續(BL 解鎖)
 
-臺版機在 root 之後可以走 ABL 替換法解鎖(不需要官方名額):備份 abl_a/b →
+國際版機在 root 之後可以走 ABL 替換法解鎖(不需要官方名額):備份 abl_a/b →
 刷入 unlock EFI → fastboot 刷出廠 ABL + spoof → 還原。出廠 ABL 從**自己手上的
 臺版 3.0.1.0 ROM** 的 `abl.img` 取得(本 repo 不放小米專有韌體檔案)。
 `scripts/device_step1.sh` 是這個流程的手機端部分。此流程不清使用者資料。
@@ -91,10 +91,10 @@ adb shell /data/local/tmp/e
 
 ## English Summary
 
-The Taiwan/global firmware of the REDMI K90 Pro Max ships a **different kernel build**
+The global firmware of the POCO F8 Ultra (REDMI K90 Pro Max) ships a **different kernel build**
 than the CN firmware (different branch, config, and PGO/BOLT layout), so all
-community-published GhostLock offsets — computed on CN `ogki` kernels — miss on TW
-devices. This repo provides the missing target offsets for
+community-published GhostLock offsets — computed on CN `ogki` kernels — miss on
+global devices. This repo provides the missing target offsets for
 `OS3.0.6.0.WPMTWXM` (`6.12.23-android16-5-g5a0e85dd9db0-ab14499855-4k`),
 statically extracted from the official OTA package and cross-validated
 (kallsyms + BTF + in-image reads), plus a prebuilt binary in Releases.
@@ -102,7 +102,7 @@ Struct layouts are identical to the CN build; only symbol addresses differ.
 Stack-frame layout matches the verified-working Xiaomi 17 (pudding).
 
 **Use only on your own device.** The vulnerability is public (kernelCTF-mandated
-disclosure); this port exists so Taiwan-variant owners can root their own phones.
+disclosure); this port exists so global-variant owners can root their own phones.
 
 ## 免責聲明 / Disclaimer
 
